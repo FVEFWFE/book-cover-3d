@@ -77,13 +77,14 @@ export const BookCover = ({
           <div className={`book-container-${uniqueId}`}>
             <div className="book">
               <div className="book-front">{children}</div>
-              {backCover && <div className="book-back">{backCover}</div>}
+              {backCover && <div className="book-back" style={{ display: 'none' }}>{backCover}</div>}
             </div>
           </div>
           {backCover && (
             <div className={`book-container-${uniqueId} book-back-container`}>
               <div className="book book-back-view">
-                <div className="book-front">{backCover}</div>
+                <div className="book-front" style={{ display: 'none' }}>{children}</div>
+                <div className="book-back">{backCover}</div>
               </div>
             </div>
           )}
@@ -318,6 +319,23 @@ export const getCssForSettings = (
       
       .book-container-${uniqueId}.book-back-container .book:hover {
         transform: rotateY(-175deg);
+      }
+      
+      .book-container-${uniqueId}.book-back-container .book .book-back {
+        display: block !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: ${settings.width}px;
+        height: ${settings.height}px;
+        transform: translateZ(${settings.thickness / 2}px) rotateY(0deg);
+        background-color: ${settings.bgColor};
+        border-radius: ${settings.radius}px 0 0 ${settings.radius}px;
+        backface-visibility: visible;
+      }
+      
+      .book-container-${uniqueId}.book-back-container .book .book-front {
+        display: none !important;
       }
     `
   } else if (displayMode === 'flip') {
