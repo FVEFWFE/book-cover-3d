@@ -4,71 +4,57 @@ import { BookCover } from '../components/BookCover'
 export default function Home() {
   const [rotation, setRotation] = useState(30)
   const [isDragging, setIsDragging] = useState(false)
+  const [frontCoverImage, setFrontCoverImage] = useState<string | null>(null)
+  const [backCoverImage, setBackCoverImage] = useState<string | null>(null)
   const dragStartX = useRef(0)
   const startRotation = useRef(30)
   const containerRef = useRef<HTMLDivElement>(null)
+  const frontFileInputRef = useRef<HTMLInputElement>(null)
+  const backFileInputRef = useRef<HTMLInputElement>(null)
 
   // Book dimensions matching 1563x2500 aspect ratio
   const bookWidth = 250
   const bookHeight = 400  // Maintains the 0.625 aspect ratio
   const bookThickness = 60
 
-  // Front cover with image (update path when image is available)
-  const frontCover = (
+  // Handle file upload for covers
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>, coverType: 'front' | 'back') => {
+    const file = event.target.files?.[0]
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string
+        if (coverType === 'front') {
+          setFrontCoverImage(dataUrl)
+        } else {
+          setBackCoverImage(dataUrl)
+        }
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  // Default front cover design
+  const defaultFrontCover = (
     <div style={{
       width: '100%',
       height: '100%',
-      position: 'relative',
-      overflow: 'hidden',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      color: 'white',
+      fontFamily: 'system-ui, -apple-system, sans-serif',
     }}>
-      {/* Try to load the actual book cover image */}
-      <img 
-        src="/images/front-cover-only-final.png" 
-        alt="Book Cover" 
-        style={{ 
-          width: '100%', 
-          height: '100%', 
-          objectFit: 'cover',
-          display: 'block',
-        }}
-        onError={(e) => {
-          // Hide image if it fails to load and show fallback
-          (e.target as HTMLImageElement).style.display = 'none';
-        }}
-      />
-      {/* Fallback gradient design */}
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        color: 'white',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-      }}>
-        <h2 style={{ fontSize: '28px', margin: '0 0 10px 0', fontWeight: 'bold' }}>The Great Book</h2>
-        <p style={{ fontSize: '16px', margin: '0' }}>A Novel</p>
-        <p style={{ fontSize: '14px', position: 'absolute', bottom: '30px' }}>John Doe</p>
-        <p style={{ 
-          fontSize: '12px', 
-          position: 'absolute', 
-          top: '20px',
-          padding: '5px 10px',
-          background: 'rgba(0,0,0,0.3)',
-          borderRadius: '4px',
-        }}>
-          Add your image: /demo/public/images/front-cover-only-final.png
-        </p>
-      </div>
+      <h2 style={{ fontSize: '28px', margin: '0 0 10px 0', fontWeight: 'bold' }}>Your Book Title</h2>
+      <p style={{ fontSize: '16px', margin: '0' }}>Upload your cover</p>
+      <p style={{ fontSize: '14px', position: 'absolute', bottom: '30px' }}>Author Name</p>
     </div>
   )
 
-  const backCover = (
+  // Default back cover design
+  const defaultBackCover = (
     <div style={{
       width: '100%',
       height: '100%',
@@ -84,19 +70,45 @@ export default function Home() {
       <div>
         <h3 style={{ fontSize: '18px', margin: '0 0 15px 0', fontWeight: 'bold' }}>About the Book</h3>
         <p style={{ fontSize: '13px', lineHeight: '1.5' }}>
-          An extraordinary journey through time and space, exploring the depths of human emotion
-          and the mysteries of the universe. This compelling narrative weaves together themes of
-          love, loss, and redemption in a story that will captivate readers from the first page
-          to the last.
+          Upload your back cover image or use this default design. 
+          You can add your book description, reviews, ISBN, and pricing information here.
         </p>
       </div>
       <div>
-        <p style={{ fontSize: '12px', margin: '8px 0' }}>⭐⭐⭐⭐⭐ "A masterpiece!" - Book Review</p>
-        <p style={{ fontSize: '12px', margin: '8px 0' }}>ISBN: 978-1-234-56789-0</p>
-        <p style={{ fontSize: '14px', margin: '8px 0', fontWeight: 'bold' }}>$24.99</p>
+        <p style={{ fontSize: '12px', margin: '8px 0' }}>⭐⭐⭐⭐⭐ "Upload your back cover!"</p>
+        <p style={{ fontSize: '12px', margin: '8px 0' }}>ISBN: XXX-X-XXX-XXXXX-X</p>
+        <p style={{ fontSize: '14px', margin: '8px 0', fontWeight: 'bold' }}>$XX.99</p>
       </div>
     </div>
   )
+
+  // Front cover with uploaded image or default
+  const frontCover = frontCoverImage ? (
+    <img 
+      src={frontCoverImage} 
+      alt="Front Cover" 
+      style={{ 
+        width: '100%', 
+        height: '100%', 
+        objectFit: 'cover',
+        display: 'block',
+      }}
+    />
+  ) : defaultFrontCover
+
+  // Back cover with uploaded image or default
+  const backCover = backCoverImage ? (
+    <img 
+      src={backCoverImage} 
+      alt="Back Cover" 
+      style={{ 
+        width: '100%', 
+        height: '100%', 
+        objectFit: 'cover',
+        display: 'block',
+      }}
+    />
+  ) : defaultBackCover
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true)
@@ -152,12 +164,185 @@ export default function Home() {
             Interactive 3D Book Cover
           </h1>
           <p style={{ fontSize: '18px', color: '#6c757d' }}>
-            Drag to rotate • Flip between covers • View side-by-side
+            Upload your covers • Drag to rotate • Flip between covers • View side-by-side
           </p>
           <p style={{ fontSize: '14px', color: '#868e96', marginTop: '10px' }}>
             Book dimensions: {bookWidth}×{bookHeight}px (matching 1563×2500 aspect ratio)
           </p>
         </header>
+
+        {/* Upload Controls */}
+        <section style={{ marginBottom: '60px' }}>
+          <div style={{ 
+            maxWidth: '600px',
+            margin: '0 auto',
+            padding: '30px',
+            background: 'white',
+            borderRadius: '16px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          }}>
+            <h2 style={{ 
+              fontSize: '24px', 
+              marginBottom: '20px', 
+              color: '#212529',
+              textAlign: 'center',
+            }}>
+              📚 Upload Your Book Covers
+            </h2>
+            
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: '1fr 1fr',
+              gap: '20px',
+              marginBottom: '20px',
+            }}>
+              {/* Front Cover Upload */}
+              <div>
+                <input
+                  ref={frontFileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFileUpload(e, 'front')}
+                  style={{ display: 'none' }}
+                />
+                <button
+                  onClick={() => frontFileInputRef.current?.click()}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    background: frontCoverImage 
+                      ? 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)'
+                      : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)'
+                    e.currentTarget.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.15)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)'
+                    e.currentTarget.style.boxShadow = 'none'
+                  }}
+                >
+                  <span style={{ fontSize: '20px' }}>📖</span>
+                  <span>{frontCoverImage ? '✓ Front Cover Uploaded' : 'Upload Front Cover'}</span>
+                </button>
+                {frontCoverImage && (
+                  <button
+                    onClick={() => setFrontCoverImage(null)}
+                    style={{
+                      width: '100%',
+                      marginTop: '8px',
+                      padding: '8px',
+                      background: '#e53e3e',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      transition: 'all 0.3s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#c53030'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#e53e3e'
+                    }}
+                  >
+                    Remove Front Cover
+                  </button>
+                )}
+              </div>
+
+              {/* Back Cover Upload */}
+              <div>
+                <input
+                  ref={backFileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFileUpload(e, 'back')}
+                  style={{ display: 'none' }}
+                />
+                <button
+                  onClick={() => backFileInputRef.current?.click()}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    background: backCoverImage 
+                      ? 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)'
+                      : 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)'
+                    e.currentTarget.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.15)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)'
+                    e.currentTarget.style.boxShadow = 'none'
+                  }}
+                >
+                  <span style={{ fontSize: '20px' }}>📘</span>
+                  <span>{backCoverImage ? '✓ Back Cover Uploaded' : 'Upload Back Cover'}</span>
+                </button>
+                {backCoverImage && (
+                  <button
+                    onClick={() => setBackCoverImage(null)}
+                    style={{
+                      width: '100%',
+                      marginTop: '8px',
+                      padding: '8px',
+                      background: '#e53e3e',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      transition: 'all 0.3s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#c53030'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#e53e3e'
+                    }}
+                  >
+                    Remove Back Cover
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <p style={{ 
+              textAlign: 'center', 
+              color: '#6c757d',
+              fontSize: '13px',
+              margin: '0',
+            }}>
+              Supported formats: JPG, PNG, WebP, GIF • Recommended: 1563×2500px
+            </p>
+          </div>
+        </section>
 
         {/* Flip Mode with Draggable Rotation */}
         <section style={{ marginBottom: '80px' }}>
