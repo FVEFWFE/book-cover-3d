@@ -183,7 +183,19 @@ export const getCssForSettings = (
       transform: rotateY(${-settings.rotateHover}deg);
     }
     
-    .book-container-${uniqueId} .book .book-front,
+    .book-container-${uniqueId} .book .book-front {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: ${settings.width}px;
+      height: ${settings.height}px;
+      transform: translateZ(${settings.thickness / 2}px);
+      border-radius: 0 ${settings.radius}px ${settings.radius}px 0;
+      box-shadow: 5px 5px 20px ${settings.shadowColor};
+      backface-visibility: hidden;
+      overflow: hidden;
+    }
+    
     .book-container-${uniqueId} .book > :first-child:not(.book-front):not(.book-back) {
       position: absolute;
       top: 0;
@@ -255,7 +267,7 @@ export const getCssForSettings = (
       width: ${settings.width}px;
       height: ${settings.height}px;
       transform: translateZ(${-settings.thickness / 2}px) rotateY(180deg);
-      border-radius: ${settings.radius}px 0 0 ${settings.radius}px;
+      border-radius: 0 ${settings.radius}px ${settings.radius}px 0;
       backface-visibility: hidden;
       overflow: hidden;
     }
@@ -412,28 +424,6 @@ export const getCssForSettings = (
       
       .book-container-${uniqueId} .book.flipped:hover {
         transform: rotateY(-175deg);
-      }
-      
-      .book-container-${uniqueId} .book .book-front {
-        transition: opacity 0.1s ease ${settings.transitionDuration * 0.7}s;
-        opacity: 1;
-      }
-      
-      .book-container-${uniqueId} .book.flipped .book-front {
-        opacity: 0;
-        transition: opacity 0.1s ease;
-      }
-      
-      .book-container-${uniqueId} .book .book-back {
-        opacity: 0;
-        backface-visibility: visible;
-        transform: translateZ(${settings.thickness / 2}px) rotateY(0deg);
-        transition: opacity 0.1s ease;
-      }
-      
-      .book-container-${uniqueId} .book.flipped .book-back {
-        opacity: 1;
-        transition: opacity 0.1s ease ${settings.transitionDuration * 0.7}s;
       }
     `
   }
