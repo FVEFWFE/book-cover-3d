@@ -1,9 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { BookCover } from '../components/BookCover'
 
 export default function Home() {
   const [rotation, setRotation] = useState(30)
   const [isDragging, setIsDragging] = useState(false)
+  const [isDraggingFile, setIsDraggingFile] = useState(false)
+  const [dragTarget, setDragTarget] = useState<'front' | 'back' | null>(null)
   const [frontCoverImage, setFrontCoverImage] = useState<string | null>(null)
   const [backCoverImage, setBackCoverImage] = useState<string | null>(null)
   const dragStartX = useRef(0)
@@ -16,6 +18,15 @@ export default function Home() {
   const bookWidth = 250
   const bookHeight = 400  // Maintains the 0.625 aspect ratio
   const bookThickness = 60
+
+  // Preset rotation angles
+  const presetAngles = [
+    { label: 'Front', angle: 0, icon: '⬅️' },
+    { label: 'Quarter', angle: 30, icon: '↖️' },
+    { label: 'Side', angle: 90, icon: '⬆️' },
+    { label: 'Back Quarter', angle: 150, icon: '↗️' },
+    { label: 'Back', angle: 180, icon: '➡️' },
+  ]
 
   // Handle file upload for covers
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>, coverType: 'front' | 'back') => {
@@ -34,6 +45,82 @@ export default function Home() {
     }
   }
 
+  // Handle drag and drop
+  const handleDragOver = (e: React.DragEvent, coverType: 'front' | 'back') => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDraggingFile(true)
+    setDragTarget(coverType)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDraggingFile(false)
+    setDragTarget(null)
+  }
+
+  const handleDrop = (e: React.DragEvent, coverType: 'front' | 'back') => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDraggingFile(false)
+    setDragTarget(null)
+
+    const file = e.dataTransfer.files[0]
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        const dataUrl = event.target?.result as string
+        if (coverType === 'front') {
+          setFrontCoverImage(dataUrl)
+        } else {
+          setBackCoverImage(dataUrl)
+        }
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  // Keyboard controls
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+      
+      switch(e.key) {
+        case 'ArrowLeft':
+          e.preventDefault()
+          setRotation(r => r + 5)
+          break
+        case 'ArrowRight':
+          e.preventDefault()
+          setRotation(r => r - 5)
+          break
+        case 'r':
+        case 'R':
+          setRotation(30)
+          break
+        case '1':
+          setRotation(0)
+          break
+        case '2':
+          setRotation(30)
+          break
+        case '3':
+          setRotation(90)
+          break
+        case '4':
+          setRotation(150)
+          break
+        case '5':
+          setRotation(180)
+          break
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
+    return () => window.removeEventListener('keydown', handleKeyPress)
+  }, [])
+
   // Default front cover design
   const defaultFrontCover = (
     <div style={{
@@ -47,9 +134,10 @@ export default function Home() {
       color: 'white',
       fontFamily: 'system-ui, -apple-system, sans-serif',
     }}>
+      <div style={{ fontSize: '48px', marginBottom: '20px', opacity: 0.8 }}>📚</div>
       <h2 style={{ fontSize: '28px', margin: '0 0 10px 0', fontWeight: 'bold' }}>Your Book Title</h2>
-      <p style={{ fontSize: '16px', margin: '0' }}>Upload your cover</p>
-      <p style={{ fontSize: '14px', position: 'absolute', bottom: '30px' }}>Author Name</p>
+      <p style={{ fontSize: '16px', margin: '0', opacity: 0.9 }}>Drop or upload your cover</p>
+      <p style={{ fontSize: '14px', position: 'absolute', bottom: '30px', opacity: 0.8 }}>Author Name</p>
     </div>
   )
 
@@ -69,13 +157,13 @@ export default function Home() {
     }}>
       <div>
         <h3 style={{ fontSize: '18px', margin: '0 0 15px 0', fontWeight: 'bold' }}>About the Book</h3>
-        <p style={{ fontSize: '13px', lineHeight: '1.5' }}>
-          Upload your back cover image or use this default design. 
-          You can add your book description, reviews, ISBN, and pricing information here.
+        <p style={{ fontSize: '13px', lineHeight: '1.5', opacity: 0.9 }}>
+          Drop your back cover image here or click to upload. 
+          Perfect for book descriptions, reviews, ISBN, and pricing.
         </p>
       </div>
-      <div>
-        <p style={{ fontSize: '12px', margin: '8px 0' }}>⭐⭐⭐⭐⭐ "Upload your back cover!"</p>
+      <div style={{ opacity: 0.8 }}>
+        <p style={{ fontSize: '12px', margin: '8px 0' }}>⭐⭐⭐⭐⭐ "Add your reviews!"</p>
         <p style={{ fontSize: '12px', margin: '8px 0' }}>ISBN: XXX-X-XXX-XXXXX-X</p>
         <p style={{ fontSize: '14px', margin: '8px 0', fontWeight: 'bold' }}>$XX.99</p>
       </div>
@@ -117,17 +205,17 @@ export default function Home() {
     e.preventDefault()
   }
 
-  const handleMouseMove = (e: MouseEvent) => {
+  const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!isDragging) return
     
     const deltaX = e.clientX - dragStartX.current
-    const newRotation = startRotation.current - (deltaX * 0.5) // Negative for natural drag direction
+    const newRotation = startRotation.current - (deltaX * 0.5)
     setRotation(newRotation)
-  }
+  }, [isDragging])
 
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     setIsDragging(false)
-  }
+  }, [])
 
   useEffect(() => {
     if (isDragging) {
@@ -143,7 +231,7 @@ export default function Home() {
         document.body.style.userSelect = 'auto'
       }
     }
-  }, [isDragging])
+  }, [isDragging, handleMouseMove, handleMouseUp])
 
   return (
     <div style={{ 
@@ -152,9 +240,9 @@ export default function Home() {
       padding: '40px 20px',
     }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-        <header style={{ textAlign: 'center', marginBottom: '60px' }}>
+        <header style={{ textAlign: 'center', marginBottom: '40px' }}>
           <h1 style={{ 
-            fontSize: '48px', 
+            fontSize: 'clamp(32px, 5vw, 48px)', 
             fontWeight: 'bold',
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             WebkitBackgroundClip: 'text',
@@ -163,18 +251,18 @@ export default function Home() {
           }}>
             Interactive 3D Book Cover
           </h1>
-          <p style={{ fontSize: '18px', color: '#6c757d' }}>
-            Upload your covers • Drag to rotate • Flip between covers • View side-by-side
+          <p style={{ fontSize: 'clamp(14px, 2vw, 18px)', color: '#6c757d' }}>
+            Drag & drop your covers • Rotate with mouse or keyboard • View in 3D
           </p>
-          <p style={{ fontSize: '14px', color: '#868e96', marginTop: '10px' }}>
-            Book dimensions: {bookWidth}×{bookHeight}px (matching 1563×2500 aspect ratio)
+          <p style={{ fontSize: 'clamp(12px, 1.5vw, 14px)', color: '#868e96', marginTop: '10px' }}>
+            Book dimensions: {bookWidth}×{bookHeight}px • Use ← → arrow keys or 1-5 number keys
           </p>
         </header>
 
-        {/* Upload Controls */}
-        <section style={{ marginBottom: '60px' }}>
+        {/* Upload Controls with Drag & Drop */}
+        <section style={{ marginBottom: '40px' }}>
           <div style={{ 
-            maxWidth: '600px',
+            maxWidth: '800px',
             margin: '0 auto',
             padding: '30px',
             background: 'white',
@@ -192,12 +280,23 @@ export default function Home() {
             
             <div style={{ 
               display: 'grid', 
-              gridTemplateColumns: '1fr 1fr',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
               gap: '20px',
               marginBottom: '20px',
             }}>
-              {/* Front Cover Upload */}
-              <div>
+              {/* Front Cover Upload with Drag & Drop */}
+              <div
+                onDragOver={(e) => handleDragOver(e, 'front')}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, 'front')}
+                style={{
+                  border: `2px dashed ${isDraggingFile && dragTarget === 'front' ? '#667eea' : '#cbd5e0'}`,
+                  borderRadius: '12px',
+                  padding: '20px',
+                  transition: 'all 0.3s ease',
+                  background: isDraggingFile && dragTarget === 'front' ? 'rgba(102, 126, 234, 0.05)' : 'transparent',
+                }}
+              >
                 <input
                   ref={frontFileInputRef}
                   type="file"
@@ -205,6 +304,23 @@ export default function Home() {
                   onChange={(e) => handleFileUpload(e, 'front')}
                   style={{ display: 'none' }}
                 />
+                
+                {frontCoverImage && (
+                  <div style={{ marginBottom: '15px', textAlign: 'center' }}>
+                    <img 
+                      src={frontCoverImage} 
+                      alt="Front preview"
+                      style={{
+                        width: '80px',
+                        height: '128px',
+                        objectFit: 'cover',
+                        borderRadius: '4px',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                      }}
+                    />
+                  </div>
+                )}
+                
                 <button
                   onClick={() => frontFileInputRef.current?.click()}
                   style={{
@@ -225,18 +341,12 @@ export default function Home() {
                     alignItems: 'center',
                     gap: '4px',
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)'
-                    e.currentTarget.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.15)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)'
-                    e.currentTarget.style.boxShadow = 'none'
-                  }}
                 >
                   <span style={{ fontSize: '20px' }}>📖</span>
-                  <span>{frontCoverImage ? '✓ Front Cover Uploaded' : 'Upload Front Cover'}</span>
+                  <span>{frontCoverImage ? '✓ Front Cover' : 'Front Cover'}</span>
+                  <span style={{ fontSize: '11px', opacity: 0.9 }}>Click or drop image</span>
                 </button>
+                
                 {frontCoverImage && (
                   <button
                     onClick={() => setFrontCoverImage(null)}
@@ -244,28 +354,33 @@ export default function Home() {
                       width: '100%',
                       marginTop: '8px',
                       padding: '8px',
-                      background: '#e53e3e',
-                      color: 'white',
-                      border: 'none',
+                      background: 'transparent',
+                      color: '#e53e3e',
+                      border: '1px solid #e53e3e',
                       borderRadius: '6px',
                       cursor: 'pointer',
                       fontSize: '12px',
                       transition: 'all 0.3s ease',
                     }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = '#c53030'
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = '#e53e3e'
-                    }}
                   >
-                    Remove Front Cover
+                    Remove
                   </button>
                 )}
               </div>
 
-              {/* Back Cover Upload */}
-              <div>
+              {/* Back Cover Upload with Drag & Drop */}
+              <div
+                onDragOver={(e) => handleDragOver(e, 'back')}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, 'back')}
+                style={{
+                  border: `2px dashed ${isDraggingFile && dragTarget === 'back' ? '#764ba2' : '#cbd5e0'}`,
+                  borderRadius: '12px',
+                  padding: '20px',
+                  transition: 'all 0.3s ease',
+                  background: isDraggingFile && dragTarget === 'back' ? 'rgba(118, 75, 162, 0.05)' : 'transparent',
+                }}
+              >
                 <input
                   ref={backFileInputRef}
                   type="file"
@@ -273,6 +388,23 @@ export default function Home() {
                   onChange={(e) => handleFileUpload(e, 'back')}
                   style={{ display: 'none' }}
                 />
+                
+                {backCoverImage && (
+                  <div style={{ marginBottom: '15px', textAlign: 'center' }}>
+                    <img 
+                      src={backCoverImage} 
+                      alt="Back preview"
+                      style={{
+                        width: '80px',
+                        height: '128px',
+                        objectFit: 'cover',
+                        borderRadius: '4px',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                      }}
+                    />
+                  </div>
+                )}
+                
                 <button
                   onClick={() => backFileInputRef.current?.click()}
                   style={{
@@ -293,18 +425,12 @@ export default function Home() {
                     alignItems: 'center',
                     gap: '4px',
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)'
-                    e.currentTarget.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.15)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)'
-                    e.currentTarget.style.boxShadow = 'none'
-                  }}
                 >
                   <span style={{ fontSize: '20px' }}>📘</span>
-                  <span>{backCoverImage ? '✓ Back Cover Uploaded' : 'Upload Back Cover'}</span>
+                  <span>{backCoverImage ? '✓ Back Cover' : 'Back Cover'}</span>
+                  <span style={{ fontSize: '11px', opacity: 0.9 }}>Click or drop image</span>
                 </button>
+                
                 {backCoverImage && (
                   <button
                     onClick={() => setBackCoverImage(null)}
@@ -312,22 +438,16 @@ export default function Home() {
                       width: '100%',
                       marginTop: '8px',
                       padding: '8px',
-                      background: '#e53e3e',
-                      color: 'white',
-                      border: 'none',
+                      background: 'transparent',
+                      color: '#e53e3e',
+                      border: '1px solid #e53e3e',
                       borderRadius: '6px',
                       cursor: 'pointer',
                       fontSize: '12px',
                       transition: 'all 0.3s ease',
                     }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = '#c53030'
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = '#e53e3e'
-                    }}
                   >
-                    Remove Back Cover
+                    Remove
                   </button>
                 )}
               </div>
@@ -339,33 +459,98 @@ export default function Home() {
               fontSize: '13px',
               margin: '0',
             }}>
-              Supported formats: JPG, PNG, WebP, GIF • Recommended: 1563×2500px
+              Supported: JPG, PNG, WebP, GIF • Recommended: 1563×2500px • Max: 10MB
             </p>
           </div>
         </section>
 
-        {/* Flip Mode with Draggable Rotation */}
-        <section style={{ marginBottom: '80px' }}>
+        {/* Rotation Controls */}
+        <section style={{ marginBottom: '30px' }}>
+          <div style={{ 
+            maxWidth: '800px',
+            margin: '0 auto',
+            padding: '20px',
+            background: 'white',
+            borderRadius: '12px',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+          }}>
+            <div style={{ 
+              display: 'flex', 
+              flexWrap: 'wrap',
+              gap: '10px',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+              <span style={{ 
+                color: '#6c757d', 
+                fontSize: '14px',
+                marginRight: '10px',
+              }}>
+                Quick angles:
+              </span>
+              {presetAngles.map((preset) => (
+                <button
+                  key={preset.angle}
+                  onClick={() => setRotation(preset.angle)}
+                  style={{
+                    padding: '8px 12px',
+                    background: rotation === preset.angle 
+                      ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                      : 'white',
+                    color: rotation === preset.angle ? 'white' : '#495057',
+                    border: rotation === preset.angle ? 'none' : '1px solid #dee2e6',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  <span>{preset.icon}</span>
+                  <span>{preset.label}</span>
+                </button>
+              ))}
+              
+              <div style={{ 
+                marginLeft: '20px',
+                padding: '8px 12px',
+                background: '#f8f9fa',
+                borderRadius: '6px',
+                fontSize: '13px',
+                color: '#495057',
+                fontWeight: '500',
+              }}>
+                {rotation.toFixed(0)}°
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Side-by-Side Mode (Primary View) */}
+        <section style={{ marginBottom: '60px' }}>
           <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-            <h2 style={{ fontSize: '32px', marginBottom: '10px', color: '#212529' }}>
-              🔄 Flip Mode with Drag Rotation
+            <h2 style={{ fontSize: 'clamp(24px, 3vw, 32px)', marginBottom: '10px', color: '#212529' }}>
+              👥 Side-by-Side 3D View
             </h2>
             <p style={{ color: '#6c757d', maxWidth: '600px', margin: '0 auto' }}>
-              Click and drag to rotate the book horizontally. Use the flip button to see the back cover.
+              Both covers displayed as realistic 3D books • Drag to rotate manually
             </p>
           </div>
           <div style={{ 
             display: 'flex', 
             justifyContent: 'center', 
-            padding: '60px 40px',
+            padding: 'clamp(30px, 5vw, 60px) clamp(20px, 3vw, 40px)',
             background: 'white',
             borderRadius: '16px',
             boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
-            position: 'relative',
             minHeight: `${bookHeight + 120}px`,
+            position: 'relative',
+            overflow: 'hidden',
           }}>
             <div 
-              ref={containerRef}
               onMouseDown={handleMouseDown}
               style={{ 
                 cursor: isDragging ? 'grabbing' : 'grab',
@@ -374,71 +559,49 @@ export default function Home() {
             >
               <BookCover
                 backCover={backCover}
-                displayMode="flip"
+                displayMode="side-by-side"
                 rotate={rotation}
-                showFlipControls={true}
                 width={bookWidth}
                 height={bookHeight}
                 thickness={bookThickness}
-                rotateHover={rotation} // Keep the same rotation on hover
-                transitionDuration={isDragging ? 0 : 1} // No transition while dragging
+                rotateHover={rotation}
+                transitionDuration={isDragging ? 0 : 0.3}
               >
                 {frontCover}
               </BookCover>
             </div>
-          </div>
-          
-          <div style={{ 
-            textAlign: 'center', 
-            marginTop: '30px',
-            color: '#6c757d',
-          }}>
-            <p style={{ fontSize: '14px', marginBottom: '10px' }}>
-              Current rotation: {rotation.toFixed(0)}°
-            </p>
-            <button
-              onClick={() => setRotation(30)}
-              style={{
-                padding: '8px 16px',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '500',
-                transition: 'all 0.3s ease',
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)'
-                e.currentTarget.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.15)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)'
-              }}
-            >
-              Reset Rotation
-            </button>
+            
+            {/* Rotation indicator */}
+            <div style={{
+              position: 'absolute',
+              bottom: '20px',
+              right: '20px',
+              padding: '8px 12px',
+              background: 'rgba(0,0,0,0.7)',
+              color: 'white',
+              borderRadius: '6px',
+              fontSize: '12px',
+              fontFamily: 'monospace',
+            }}>
+              Rotation: {rotation.toFixed(0)}°
+            </div>
           </div>
         </section>
 
-        {/* Side-by-Side Mode */}
-        <section style={{ marginBottom: '80px' }}>
+        {/* Flip Mode */}
+        <section style={{ marginBottom: '60px' }}>
           <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-            <h2 style={{ fontSize: '32px', marginBottom: '10px', color: '#212529' }}>
-              👥 Side-by-Side Mode
+            <h2 style={{ fontSize: 'clamp(24px, 3vw, 32px)', marginBottom: '10px', color: '#212529' }}>
+              🔄 Flip Animation Mode
             </h2>
             <p style={{ color: '#6c757d', maxWidth: '600px', margin: '0 auto' }}>
-              Display both covers simultaneously as separate 3D mockups. 
-              Ideal for comparing front and back designs at a glance.
+              Interactive page-turning effect between covers
             </p>
           </div>
           <div style={{ 
             display: 'flex', 
             justifyContent: 'center', 
-            padding: '60px 40px',
+            padding: 'clamp(30px, 5vw, 60px) clamp(20px, 3vw, 40px)',
             background: 'white',
             borderRadius: '16px',
             boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
@@ -446,8 +609,9 @@ export default function Home() {
           }}>
             <BookCover
               backCover={backCover}
-              displayMode="side-by-side"
+              displayMode="flip"
               rotate={30}
+              showFlipControls={true}
               width={bookWidth}
               height={bookHeight}
               thickness={bookThickness}
@@ -464,7 +628,10 @@ export default function Home() {
           marginTop: '80px',
           color: '#6c757d',
         }}>
-          <p>Interactive 3D Book Cover with Multiple Display Modes</p>
+          <p style={{ marginBottom: '10px' }}>Interactive 3D Book Cover Viewer</p>
+          <p style={{ fontSize: '12px', opacity: 0.8 }}>
+            Keyboard shortcuts: Arrow keys to rotate • 1-5 for presets • R to reset
+          </p>
         </footer>
       </div>
     </div>
