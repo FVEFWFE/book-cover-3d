@@ -1,0 +1,705 @@
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width"/><meta name="next-head-count" content="2"/><noscript data-n-css=""></noscript><script defer="" crossorigin="" nomodule="" src="/_next/static/chunks/polyfills-c67a75d1b6f99dc8.js"></script><script src="/_next/static/chunks/webpack-7d45971437c161ca.js" defer="" crossorigin=""></script><script src="/_next/static/chunks/framework-fae63b21a27d6472.js" defer="" crossorigin=""></script><script src="/_next/static/chunks/main-22b029abc2beadb0.js" defer="" crossorigin=""></script><script src="/_next/static/chunks/pages/_app-c54702eb327175a3.js" defer="" crossorigin=""></script><script src="/_next/static/chunks/pages/index-0290047b8ed6c1d9.js" defer="" crossorigin=""></script><script src="/_next/static/LNj8HkG-NM31sflYb3fsb/_buildManifest.js" defer="" crossorigin=""></script><script src="/_next/static/LNj8HkG-NM31sflYb3fsb/_ssgManifest.js" defer="" crossorigin=""></script></head><body><div id="__next"><div style="min-height:100vh;background:linear-gradient(to bottom, #f8f9fa, #e9ecef);padding:40px 20px"><div style="max-width:1200px;margin:0 auto"><header style="text-align:center;margin-bottom:60px"><h1 style="font-size:48px;font-weight:bold;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px">3D Book Cover Demo</h1><p style="font-size:18px;color:#6c757d">Interactive 3D book covers with front and back support</p></header><section style="margin-bottom:80px"><div style="text-align:center;margin-bottom:30px"><h2 style="font-size:32px;margin-bottom:10px;color:#212529">📚 Rotate Mode</h2><p style="color:#6c757d;max-width:600px;margin:0 auto">Click the button to smoothly rotate the book and reveal the back cover. Perfect for showcasing both sides with an elegant transition.</p></div><div style="display:flex;justify-content:center;padding:60px 40px;background:white;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.1)"><style>
+    .book-container-62b0 {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 600px;
+    }
+    
+    @keyframes initAnimation-62b0 {
+      0% {
+        transform: rotateY(-5deg);
+      }
+      100% {
+        transform: rotateY(-30deg);
+      }
+    }
+    
+    .book-container-62b0 .book {
+      width: 200px;
+      height: 300px;
+      position: relative;
+      transform-style: preserve-3d;
+      transform: rotateY(-30deg);
+      transition: transform 1s ease;
+      animation: 1s ease 0s 1 initAnimation-62b0;
+    }
+    
+    .book-container-62b0 .book:hover {
+      transform: rotateY(-5deg);
+    }
+    
+    .book-container-62b0 .book .book-front,
+    .book-container-62b0 .book > :first-child:not(.book-front):not(.book-back) {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 200px;
+      height: 300px;
+      transform: translateZ(25px);
+      background-color: #01060f;
+      border-radius: 0 2px 2px 0;
+      box-shadow: 5px 5px 20px #aaaaaa;
+      backface-visibility: hidden;
+    }
+    
+    .book-container-62b0 .book::before {
+      position: absolute;
+      content: ' ';
+      left: 0;
+      top: 3px;
+      width: 48px;
+      height: 294px;
+      transform: translateX(172px) rotateY(90deg);
+      background: linear-gradient(90deg, 
+        #fff 0%,
+        #f9f9f9 5%,
+        #fff 10%,
+        #f9f9f9 15%,
+        #fff 20%,
+        #f9f9f9 25%,
+        #fff 30%,
+        #f9f9f9 35%,
+        #fff 40%,
+        #f9f9f9 45%,
+        #fff 50%,
+        #f9f9f9 55%,
+        #fff 60%,
+        #f9f9f9 65%,
+        #fff 70%,
+        #f9f9f9 75%,
+        #fff 80%,
+        #f9f9f9 85%,
+        #fff 90%,
+        #f9f9f9 95%,
+        #fff 100%
+        );
+    }
+    
+    .book-container-62b0 .book::after {
+      position: absolute;
+      top: 0;
+      left: 0;
+      content: ' ';
+      width: 200px;
+      height: 300px;
+      transform: translateZ(-25px);
+      background-color: #01060f;
+      border-radius: 0 2px 2px 0;
+      box-shadow: -10px 0 50px 10px #aaaaaa;
+    }
+  
+    .book-container-62b0 .book .book-back {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 200px;
+      height: 300px;
+      transform: translateZ(-25px) rotateY(180deg);
+      background-color: #01060f;
+      border-radius: 2px 0 0 2px;
+      backface-visibility: hidden;
+    }
+  
+      .book-rotate-wrapper-62b0 {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+      
+      .book-rotate-wrapper-62b0 .rotate-controls {
+        display: flex;
+        gap: 10px;
+      }
+      
+      .book-rotate-wrapper-62b0 .rotate-button {
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      
+      .book-rotate-wrapper-62b0 .rotate-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      }
+      
+      .book-container-62b0 .book.show-back {
+        transform: rotateY(-150deg);
+      }
+      
+      .book-container-62b0 .book.show-back:hover {
+        transform: rotateY(-155deg);
+      }
+    </style><div class="book-rotate-wrapper-62b0"><div class="rotate-controls"><button class="rotate-button">Show Back</button></div><div class="book-container-62b0"><div class="book "><div class="book-front"><div style="width:100%;height:100%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);display:flex;flex-direction:column;justify-content:center;align-items:center;color:white;font-family:system-ui, -apple-system, sans-serif"><h2 style="font-size:24px;margin:0 0 10px 0;font-weight:bold">The Great Book</h2><p style="font-size:14px;margin:0">A Novel</p><p style="font-size:12px;position:absolute;bottom:20px">John Doe</p></div></div><div class="book-back"><div style="width:100%;height:100%;background:linear-gradient(135deg, #764ba2 0%, #667eea 100%);display:flex;flex-direction:column;justify-content:space-between;padding:20px;color:white;font-family:system-ui, -apple-system, sans-serif;box-sizing:border-box"><div><h3 style="font-size:16px;margin:0 0 10px 0;font-weight:bold">About the Book</h3><p style="font-size:11px;line-height:1.4">An extraordinary journey through time and space, exploring the depths of human emotion and the mysteries of the universe. This compelling narrative weaves together themes of love, loss, and redemption in a story that will captivate readers from the first page to the last.</p></div><div><p style="font-size:10px;margin:5px 0">⭐⭐⭐⭐⭐ &quot;A masterpiece!&quot; - Book Review</p><p style="font-size:10px;margin:5px 0">ISBN: 978-1-234-56789-0</p><p style="font-size:12px;margin:5px 0;font-weight:bold">$24.99</p></div></div></div></div></div></div></div></section><section style="margin-bottom:80px"><div style="text-align:center;margin-bottom:30px"><h2 style="font-size:32px;margin-bottom:10px;color:#212529">👥 Side-by-Side Mode</h2><p style="color:#6c757d;max-width:600px;margin:0 auto">Display both covers simultaneously as separate 3D mockups. Ideal for comparing front and back designs at a glance.</p></div><div style="display:flex;justify-content:center;padding:60px 40px;background:white;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.1)"><style>
+    .book-container-3ff9 {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 600px;
+    }
+    
+    @keyframes initAnimation-3ff9 {
+      0% {
+        transform: rotateY(-5deg);
+      }
+      100% {
+        transform: rotateY(-30deg);
+      }
+    }
+    
+    .book-container-3ff9 .book {
+      width: 200px;
+      height: 300px;
+      position: relative;
+      transform-style: preserve-3d;
+      transform: rotateY(-30deg);
+      transition: transform 1s ease;
+      animation: 1s ease 0s 1 initAnimation-3ff9;
+    }
+    
+    .book-container-3ff9 .book:hover {
+      transform: rotateY(-5deg);
+    }
+    
+    .book-container-3ff9 .book .book-front,
+    .book-container-3ff9 .book > :first-child:not(.book-front):not(.book-back) {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 200px;
+      height: 300px;
+      transform: translateZ(25px);
+      background-color: #01060f;
+      border-radius: 0 2px 2px 0;
+      box-shadow: 5px 5px 20px #aaaaaa;
+      backface-visibility: hidden;
+    }
+    
+    .book-container-3ff9 .book::before {
+      position: absolute;
+      content: ' ';
+      left: 0;
+      top: 3px;
+      width: 48px;
+      height: 294px;
+      transform: translateX(172px) rotateY(90deg);
+      background: linear-gradient(90deg, 
+        #fff 0%,
+        #f9f9f9 5%,
+        #fff 10%,
+        #f9f9f9 15%,
+        #fff 20%,
+        #f9f9f9 25%,
+        #fff 30%,
+        #f9f9f9 35%,
+        #fff 40%,
+        #f9f9f9 45%,
+        #fff 50%,
+        #f9f9f9 55%,
+        #fff 60%,
+        #f9f9f9 65%,
+        #fff 70%,
+        #f9f9f9 75%,
+        #fff 80%,
+        #f9f9f9 85%,
+        #fff 90%,
+        #f9f9f9 95%,
+        #fff 100%
+        );
+    }
+    
+    .book-container-3ff9 .book::after {
+      position: absolute;
+      top: 0;
+      left: 0;
+      content: ' ';
+      width: 200px;
+      height: 300px;
+      transform: translateZ(-25px);
+      background-color: #01060f;
+      border-radius: 0 2px 2px 0;
+      box-shadow: -10px 0 50px 10px #aaaaaa;
+    }
+  
+    .book-container-3ff9 .book .book-back {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 200px;
+      height: 300px;
+      transform: translateZ(-25px) rotateY(180deg);
+      background-color: #01060f;
+      border-radius: 2px 0 0 2px;
+      backface-visibility: hidden;
+    }
+  
+      .book-container-side-by-side-3ff9 {
+        display: flex;
+        gap: 40px;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .book-container-3ff9.book-back-container .book {
+        transform: rotateY(-180deg);
+      }
+      
+      .book-container-3ff9.book-back-container .book:hover {
+        transform: rotateY(-175deg);
+      }
+    </style><div class="book-container-side-by-side-3ff9"><div class="book-container-3ff9"><div class="book"><div class="book-front"><div style="width:100%;height:100%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);display:flex;flex-direction:column;justify-content:center;align-items:center;color:white;font-family:system-ui, -apple-system, sans-serif"><h2 style="font-size:24px;margin:0 0 10px 0;font-weight:bold">The Great Book</h2><p style="font-size:14px;margin:0">A Novel</p><p style="font-size:12px;position:absolute;bottom:20px">John Doe</p></div></div><div class="book-back"><div style="width:100%;height:100%;background:linear-gradient(135deg, #764ba2 0%, #667eea 100%);display:flex;flex-direction:column;justify-content:space-between;padding:20px;color:white;font-family:system-ui, -apple-system, sans-serif;box-sizing:border-box"><div><h3 style="font-size:16px;margin:0 0 10px 0;font-weight:bold">About the Book</h3><p style="font-size:11px;line-height:1.4">An extraordinary journey through time and space, exploring the depths of human emotion and the mysteries of the universe. This compelling narrative weaves together themes of love, loss, and redemption in a story that will captivate readers from the first page to the last.</p></div><div><p style="font-size:10px;margin:5px 0">⭐⭐⭐⭐⭐ &quot;A masterpiece!&quot; - Book Review</p><p style="font-size:10px;margin:5px 0">ISBN: 978-1-234-56789-0</p><p style="font-size:12px;margin:5px 0;font-weight:bold">$24.99</p></div></div></div></div></div><div class="book-container-3ff9 book-back-container"><div class="book book-back-view"><div class="book-front"><div style="width:100%;height:100%;background:linear-gradient(135deg, #764ba2 0%, #667eea 100%);display:flex;flex-direction:column;justify-content:space-between;padding:20px;color:white;font-family:system-ui, -apple-system, sans-serif;box-sizing:border-box"><div><h3 style="font-size:16px;margin:0 0 10px 0;font-weight:bold">About the Book</h3><p style="font-size:11px;line-height:1.4">An extraordinary journey through time and space, exploring the depths of human emotion and the mysteries of the universe. This compelling narrative weaves together themes of love, loss, and redemption in a story that will captivate readers from the first page to the last.</p></div><div><p style="font-size:10px;margin:5px 0">⭐⭐⭐⭐⭐ &quot;A masterpiece!&quot; - Book Review</p><p style="font-size:10px;margin:5px 0">ISBN: 978-1-234-56789-0</p><p style="font-size:12px;margin:5px 0;font-weight:bold">$24.99</p></div></div></div></div></div></div></div></section><section style="margin-bottom:80px"><div style="text-align:center;margin-bottom:30px"><h2 style="font-size:32px;margin-bottom:10px;color:#212529">🔄 Flip Mode</h2><p style="color:#6c757d;max-width:600px;margin:0 auto">Interactive flip animation that creates a realistic page-turning effect. Engaging and smooth transition between covers.</p></div><div style="display:flex;justify-content:center;padding:60px 40px;background:white;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.1)"><style>
+    .book-container-81fc {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 600px;
+    }
+    
+    @keyframes initAnimation-81fc {
+      0% {
+        transform: rotateY(-5deg);
+      }
+      100% {
+        transform: rotateY(-30deg);
+      }
+    }
+    
+    .book-container-81fc .book {
+      width: 200px;
+      height: 300px;
+      position: relative;
+      transform-style: preserve-3d;
+      transform: rotateY(-30deg);
+      transition: transform 1s ease;
+      animation: 1s ease 0s 1 initAnimation-81fc;
+    }
+    
+    .book-container-81fc .book:hover {
+      transform: rotateY(-5deg);
+    }
+    
+    .book-container-81fc .book .book-front,
+    .book-container-81fc .book > :first-child:not(.book-front):not(.book-back) {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 200px;
+      height: 300px;
+      transform: translateZ(25px);
+      background-color: #01060f;
+      border-radius: 0 2px 2px 0;
+      box-shadow: 5px 5px 20px #aaaaaa;
+      backface-visibility: hidden;
+    }
+    
+    .book-container-81fc .book::before {
+      position: absolute;
+      content: ' ';
+      left: 0;
+      top: 3px;
+      width: 48px;
+      height: 294px;
+      transform: translateX(172px) rotateY(90deg);
+      background: linear-gradient(90deg, 
+        #fff 0%,
+        #f9f9f9 5%,
+        #fff 10%,
+        #f9f9f9 15%,
+        #fff 20%,
+        #f9f9f9 25%,
+        #fff 30%,
+        #f9f9f9 35%,
+        #fff 40%,
+        #f9f9f9 45%,
+        #fff 50%,
+        #f9f9f9 55%,
+        #fff 60%,
+        #f9f9f9 65%,
+        #fff 70%,
+        #f9f9f9 75%,
+        #fff 80%,
+        #f9f9f9 85%,
+        #fff 90%,
+        #f9f9f9 95%,
+        #fff 100%
+        );
+    }
+    
+    .book-container-81fc .book::after {
+      position: absolute;
+      top: 0;
+      left: 0;
+      content: ' ';
+      width: 200px;
+      height: 300px;
+      transform: translateZ(-25px);
+      background-color: #01060f;
+      border-radius: 0 2px 2px 0;
+      box-shadow: -10px 0 50px 10px #aaaaaa;
+    }
+  
+    .book-container-81fc .book .book-back {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 200px;
+      height: 300px;
+      transform: translateZ(-25px) rotateY(180deg);
+      background-color: #01060f;
+      border-radius: 2px 0 0 2px;
+      backface-visibility: hidden;
+    }
+  
+      .book-flip-wrapper-81fc {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+      
+      .book-flip-wrapper-81fc .flip-controls {
+        display: flex;
+        gap: 10px;
+      }
+      
+      .book-flip-wrapper-81fc .flip-button {
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      
+      .book-flip-wrapper-81fc .flip-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      }
+      
+      .book-container-81fc .book {
+        transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      .book-container-81fc .book.flipped {
+        transform: rotateY(-180deg);
+      }
+      
+      .book-container-81fc .book.flipped:hover {
+        transform: rotateY(-175deg);
+      }
+      
+      .book-container-81fc .book.flipped .book-front {
+        display: none;
+      }
+      
+      .book-container-81fc .book.flipped .book-back {
+        display: block;
+        backface-visibility: visible;
+        transform: translateZ(25px) rotateY(0deg);
+      }
+    </style><div class="book-flip-wrapper-81fc"><div class="flip-controls"><button class="flip-button">Show Back Cover</button></div><div class="book-container-81fc"><div class="book "><div class="book-front"><div style="width:100%;height:100%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);display:flex;flex-direction:column;justify-content:center;align-items:center;color:white;font-family:system-ui, -apple-system, sans-serif"><h2 style="font-size:24px;margin:0 0 10px 0;font-weight:bold">The Great Book</h2><p style="font-size:14px;margin:0">A Novel</p><p style="font-size:12px;position:absolute;bottom:20px">John Doe</p></div></div><div class="book-back"><div style="width:100%;height:100%;background:linear-gradient(135deg, #764ba2 0%, #667eea 100%);display:flex;flex-direction:column;justify-content:space-between;padding:20px;color:white;font-family:system-ui, -apple-system, sans-serif;box-sizing:border-box"><div><h3 style="font-size:16px;margin:0 0 10px 0;font-weight:bold">About the Book</h3><p style="font-size:11px;line-height:1.4">An extraordinary journey through time and space, exploring the depths of human emotion and the mysteries of the universe. This compelling narrative weaves together themes of love, loss, and redemption in a story that will captivate readers from the first page to the last.</p></div><div><p style="font-size:10px;margin:5px 0">⭐⭐⭐⭐⭐ &quot;A masterpiece!&quot; - Book Review</p><p style="font-size:10px;margin:5px 0">ISBN: 978-1-234-56789-0</p><p style="font-size:12px;margin:5px 0;font-weight:bold">$24.99</p></div></div></div></div></div></div></div></section><section style="margin-bottom:80px"><div style="text-align:center;margin-bottom:30px"><h2 style="font-size:32px;margin-bottom:10px;color:#212529">🖼️ With Image Covers</h2><p style="color:#6c757d;max-width:600px;margin:0 auto">Use images or any React content for your covers. Mix and match different styles for creative presentations.</p></div><div style="display:flex;justify-content:center;padding:60px 40px;background:white;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.1)"><style>
+    .book-container-d687 {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 600px;
+    }
+    
+    @keyframes initAnimation-d687 {
+      0% {
+        transform: rotateY(-5deg);
+      }
+      100% {
+        transform: rotateY(-25deg);
+      }
+    }
+    
+    .book-container-d687 .book {
+      width: 220px;
+      height: 320px;
+      position: relative;
+      transform-style: preserve-3d;
+      transform: rotateY(-25deg);
+      transition: transform 1s ease;
+      animation: 1s ease 0s 1 initAnimation-d687;
+    }
+    
+    .book-container-d687 .book:hover {
+      transform: rotateY(-5deg);
+    }
+    
+    .book-container-d687 .book .book-front,
+    .book-container-d687 .book > :first-child:not(.book-front):not(.book-back) {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 220px;
+      height: 320px;
+      transform: translateZ(27.5px);
+      background-color: #01060f;
+      border-radius: 0 2px 2px 0;
+      box-shadow: 5px 5px 20px #aaaaaa;
+      backface-visibility: hidden;
+    }
+    
+    .book-container-d687 .book::before {
+      position: absolute;
+      content: ' ';
+      left: 0;
+      top: 3px;
+      width: 53px;
+      height: 314px;
+      transform: translateX(189.5px) rotateY(90deg);
+      background: linear-gradient(90deg, 
+        #fff 0%,
+        #f9f9f9 5%,
+        #fff 10%,
+        #f9f9f9 15%,
+        #fff 20%,
+        #f9f9f9 25%,
+        #fff 30%,
+        #f9f9f9 35%,
+        #fff 40%,
+        #f9f9f9 45%,
+        #fff 50%,
+        #f9f9f9 55%,
+        #fff 60%,
+        #f9f9f9 65%,
+        #fff 70%,
+        #f9f9f9 75%,
+        #fff 80%,
+        #f9f9f9 85%,
+        #fff 90%,
+        #f9f9f9 95%,
+        #fff 100%
+        );
+    }
+    
+    .book-container-d687 .book::after {
+      position: absolute;
+      top: 0;
+      left: 0;
+      content: ' ';
+      width: 220px;
+      height: 320px;
+      transform: translateZ(-27.5px);
+      background-color: #01060f;
+      border-radius: 0 2px 2px 0;
+      box-shadow: -10px 0 50px 10px #aaaaaa;
+    }
+  
+    .book-container-d687 .book .book-back {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 220px;
+      height: 320px;
+      transform: translateZ(-27.5px) rotateY(180deg);
+      background-color: #01060f;
+      border-radius: 2px 0 0 2px;
+      backface-visibility: hidden;
+    }
+  
+      .book-container-side-by-side-d687 {
+        display: flex;
+        gap: 40px;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .book-container-d687.book-back-container .book {
+        transform: rotateY(-180deg);
+      }
+      
+      .book-container-d687.book-back-container .book:hover {
+        transform: rotateY(-175deg);
+      }
+    </style><div class="book-container-side-by-side-d687"><div class="book-container-d687"><div class="book"><div class="book-front"><div style="width:100%;height:100%;background:url(https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&amp;h=600&amp;fit=crop) center/cover;display:flex;align-items:flex-end;justify-content:center;position:relative"><div style="background:rgba(0,0,0,0.7);color:white;padding:20px;width:100%;text-align:center;font-family:Georgia, serif"><h3 style="margin:0 0 5px 0;font-size:18px">Classic Literature</h3><p style="margin:0;font-size:12px">Timeless Stories</p></div></div></div><div class="book-back"><div style="width:100%;height:100%;background:linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:20px;color:white;font-family:Georgia, serif;box-sizing:border-box;text-align:center"><p style="font-size:12px;line-height:1.6;font-style:italic">&quot;A collection that brings together the greatest works of literature, beautifully presented for the modern reader.&quot;</p><p style="font-size:10px;margin-top:20px">www.classic-books.com</p></div></div></div></div><div class="book-container-d687 book-back-container"><div class="book book-back-view"><div class="book-front"><div style="width:100%;height:100%;background:linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:20px;color:white;font-family:Georgia, serif;box-sizing:border-box;text-align:center"><p style="font-size:12px;line-height:1.6;font-style:italic">&quot;A collection that brings together the greatest works of literature, beautifully presented for the modern reader.&quot;</p><p style="font-size:10px;margin-top:20px">www.classic-books.com</p></div></div></div></div></div></div></section><section style="margin-bottom:80px"><div style="text-align:center;margin-bottom:30px"><h2 style="font-size:32px;margin-bottom:10px;color:#212529">🎨 Fully Customizable</h2><p style="color:#6c757d;max-width:600px;margin:0 auto">Adjust dimensions, colors, thickness, rotation angles, and more. Create the perfect 3D book mockup for your needs.</p></div><div style="display:flex;justify-content:center;padding:60px 40px;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.2)"><style>
+    .book-container-38f6 {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 600px;
+    }
+    
+    @keyframes initAnimation-38f6 {
+      0% {
+        transform: rotateY(-15deg);
+      }
+      100% {
+        transform: rotateY(-45deg);
+      }
+    }
+    
+    .book-container-38f6 .book {
+      width: 250px;
+      height: 350px;
+      position: relative;
+      transform-style: preserve-3d;
+      transform: rotateY(-45deg);
+      transition: transform 1.5s ease;
+      animation: 1s ease 0s 1 initAnimation-38f6;
+    }
+    
+    .book-container-38f6 .book:hover {
+      transform: rotateY(-15deg);
+    }
+    
+    .book-container-38f6 .book .book-front,
+    .book-container-38f6 .book > :first-child:not(.book-front):not(.book-back) {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 250px;
+      height: 350px;
+      transform: translateZ(35px);
+      background-color: #2a2a2a;
+      border-radius: 0 5px 5px 0;
+      box-shadow: 5px 5px 20px rgba(0,0,0,0.5);
+      backface-visibility: hidden;
+    }
+    
+    .book-container-38f6 .book::before {
+      position: absolute;
+      content: ' ';
+      left: 0;
+      top: 5px;
+      width: 68px;
+      height: 340px;
+      transform: translateX(210px) rotateY(90deg);
+      background: linear-gradient(90deg, 
+        #fff 0%,
+        #f9f9f9 5%,
+        #fff 10%,
+        #f9f9f9 15%,
+        #fff 20%,
+        #f9f9f9 25%,
+        #fff 30%,
+        #f9f9f9 35%,
+        #fff 40%,
+        #f9f9f9 45%,
+        #fff 50%,
+        #f9f9f9 55%,
+        #fff 60%,
+        #f9f9f9 65%,
+        #fff 70%,
+        #f9f9f9 75%,
+        #fff 80%,
+        #f9f9f9 85%,
+        #fff 90%,
+        #f9f9f9 95%,
+        #fff 100%
+        );
+    }
+    
+    .book-container-38f6 .book::after {
+      position: absolute;
+      top: 0;
+      left: 0;
+      content: ' ';
+      width: 250px;
+      height: 350px;
+      transform: translateZ(-35px);
+      background-color: #2a2a2a;
+      border-radius: 0 5px 5px 0;
+      box-shadow: -10px 0 50px 10px rgba(0,0,0,0.5);
+    }
+  
+    .book-container-38f6 .book .book-back {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 250px;
+      height: 350px;
+      transform: translateZ(-35px) rotateY(180deg);
+      background-color: #2a2a2a;
+      border-radius: 5px 0 0 5px;
+      backface-visibility: hidden;
+    }
+  
+      .book-flip-wrapper-38f6 {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+      
+      .book-flip-wrapper-38f6 .flip-controls {
+        display: flex;
+        gap: 10px;
+      }
+      
+      .book-flip-wrapper-38f6 .flip-button {
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      
+      .book-flip-wrapper-38f6 .flip-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      }
+      
+      .book-container-38f6 .book {
+        transition: transform 2.25s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      .book-container-38f6 .book.flipped {
+        transform: rotateY(-180deg);
+      }
+      
+      .book-container-38f6 .book.flipped:hover {
+        transform: rotateY(-175deg);
+      }
+      
+      .book-container-38f6 .book.flipped .book-front {
+        display: none;
+      }
+      
+      .book-container-38f6 .book.flipped .book-back {
+        display: block;
+        backface-visibility: visible;
+        transform: translateZ(35px) rotateY(0deg);
+      }
+    </style><div class="book-flip-wrapper-38f6"><div class="flip-controls"><button class="flip-button">Show Back Cover</button></div><div class="book-container-38f6"><div class="book "><div class="book-front"><div style="width:100%;height:100%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);display:flex;flex-direction:column;justify-content:center;align-items:center;color:white;font-family:system-ui, -apple-system, sans-serif"><h2 style="font-size:24px;margin:0 0 10px 0;font-weight:bold">The Great Book</h2><p style="font-size:14px;margin:0">A Novel</p><p style="font-size:12px;position:absolute;bottom:20px">John Doe</p></div></div><div class="book-back"><div style="width:100%;height:100%;background:linear-gradient(135deg, #764ba2 0%, #667eea 100%);display:flex;flex-direction:column;justify-content:space-between;padding:20px;color:white;font-family:system-ui, -apple-system, sans-serif;box-sizing:border-box"><div><h3 style="font-size:16px;margin:0 0 10px 0;font-weight:bold">About the Book</h3><p style="font-size:11px;line-height:1.4">An extraordinary journey through time and space, exploring the depths of human emotion and the mysteries of the universe. This compelling narrative weaves together themes of love, loss, and redemption in a story that will captivate readers from the first page to the last.</p></div><div><p style="font-size:10px;margin:5px 0">⭐⭐⭐⭐⭐ &quot;A masterpiece!&quot; - Book Review</p><p style="font-size:10px;margin:5px 0">ISBN: 978-1-234-56789-0</p><p style="font-size:12px;margin:5px 0;font-weight:bold">$24.99</p></div></div></div></div></div></div></div></section><section style="margin-bottom:40px"><div style="text-align:center;margin-bottom:30px"><h2 style="font-size:32px;margin-bottom:10px;color:#212529">💻 Easy to Use</h2></div><div style="background:#1e293b;color:#e2e8f0;padding:30px;border-radius:16px;font-family:monospace;font-size:14px;overflow:auto"><pre style="margin:0">import { BookCover } from &#x27;book-cover-3d&#x27;
+
+// Basic usage with back cover
+&lt;BookCover backCover={backContent}&gt;
+  {frontContent}
+&lt;/BookCover&gt;
+
+// Side-by-side display
+&lt;BookCover 
+  backCover={backContent}
+  displayMode=&quot;side-by-side&quot;
+&gt;
+  {frontContent}
+&lt;/BookCover&gt;
+
+// Interactive flip mode
+&lt;BookCover 
+  backCover={backContent}
+  displayMode=&quot;flip&quot;
+  showFlipControls={true}
+&gt;
+  {frontContent}
+&lt;/BookCover&gt;</pre></div></section><footer style="text-align:center;padding:40px 0;border-top:1px solid #dee2e6;margin-top:80px;color:#6c757d"><p>Created with ❤️ using React and CSS3 transforms</p><p style="margin-top:10px"><a href="https://github.com/scastiel/book-cover-3d" style="color:#667eea;text-decoration:none">View on GitHub</a></p></footer></div></div></div><script id="__NEXT_DATA__" type="application/json" crossorigin="">{"props":{"pageProps":{}},"page":"/","query":{},"buildId":"LNj8HkG-NM31sflYb3fsb","nextExport":true,"autoExport":true,"isFallback":false,"scriptLoader":[]}</script></body></html>
