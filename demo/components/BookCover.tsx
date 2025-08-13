@@ -255,9 +255,9 @@ export const getCssForSettings = (
       width: ${settings.width}px;
       height: ${settings.height}px;
       transform: translateZ(${-settings.thickness / 2}px) rotateY(180deg);
-      background-color: ${settings.bgColor};
       border-radius: ${settings.radius}px 0 0 ${settings.radius}px;
       backface-visibility: hidden;
+      overflow: hidden;
     }
   ` : ''
 
@@ -321,6 +321,14 @@ export const getCssForSettings = (
         transform: rotateY(-175deg);
       }
       
+      .book-container-${uniqueId}.book-back-container .book::after {
+        display: none !important;
+      }
+      
+      .book-container-${uniqueId}.book-back-container .book::before {
+        display: none !important;
+      }
+      
       .book-container-${uniqueId}.book-back-container .book .book-back {
         display: block !important;
         position: absolute;
@@ -329,9 +337,9 @@ export const getCssForSettings = (
         width: ${settings.width}px;
         height: ${settings.height}px;
         transform: translateZ(${settings.thickness / 2}px) rotateY(0deg);
-        background-color: ${settings.bgColor};
         border-radius: ${settings.radius}px 0 0 ${settings.radius}px;
         backface-visibility: visible;
+        overflow: hidden;
       }
       
       .book-container-${uniqueId}.book-back-container .book .book-front {
