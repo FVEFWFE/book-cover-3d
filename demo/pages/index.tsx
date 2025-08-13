@@ -68,7 +68,7 @@ export default function Home() {
     if (!isDragging) return
     
     const deltaX = e.clientX - dragStartX.current
-    const newRotation = startRotation.current + (deltaX * 0.5) // Adjust sensitivity here
+    const newRotation = startRotation.current - (deltaX * 0.5) // Negative for natural drag direction
     setRotation(newRotation)
   }
 
@@ -111,12 +111,20 @@ export default function Home() {
             Interactive 3D Book Cover
           </h1>
           <p style={{ fontSize: '18px', color: '#6c757d' }}>
-            🔄 Flip the book with the button • 🖱️ Drag to rotate horizontally
+            Drag to rotate • Flip between covers • View side-by-side
           </p>
         </header>
 
         {/* Flip Mode with Draggable Rotation */}
         <section style={{ marginBottom: '80px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+            <h2 style={{ fontSize: '32px', marginBottom: '10px', color: '#212529' }}>
+              🔄 Flip Mode with Drag Rotation
+            </h2>
+            <p style={{ color: '#6c757d', maxWidth: '600px', margin: '0 auto' }}>
+              Click and drag to rotate the book horizontally. Use the flip button to see the back cover.
+            </p>
+          </div>
           <div style={{ 
             display: 'flex', 
             justifyContent: 'center', 
@@ -137,11 +145,13 @@ export default function Home() {
               <BookCover
                 backCover={backCover}
                 displayMode="flip"
-                rotate={-rotation}
+                rotate={rotation}
                 showFlipControls={true}
                 width={200}
                 height={300}
-                rotateHover={0} // Disable hover rotation since we're using drag
+                thickness={50}
+                rotateHover={rotation} // Keep the same rotation on hover
+                transitionDuration={isDragging ? 0 : 1} // No transition while dragging
               >
                 {frontCover}
               </BookCover>
@@ -184,6 +194,38 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Side-by-Side Mode */}
+        <section style={{ marginBottom: '80px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+            <h2 style={{ fontSize: '32px', marginBottom: '10px', color: '#212529' }}>
+              👥 Side-by-Side Mode
+            </h2>
+            <p style={{ color: '#6c757d', maxWidth: '600px', margin: '0 auto' }}>
+              Display both covers simultaneously as separate 3D mockups. 
+              Ideal for comparing front and back designs at a glance.
+            </p>
+          </div>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            padding: '60px 40px',
+            background: 'white',
+            borderRadius: '16px',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+          }}>
+            <BookCover
+              backCover={backCover}
+              displayMode="side-by-side"
+              rotate={30}
+              width={200}
+              height={300}
+              thickness={50}
+            >
+              {frontCover}
+            </BookCover>
+          </div>
+        </section>
+
         <footer style={{ 
           textAlign: 'center', 
           padding: '40px 0',
@@ -191,7 +233,7 @@ export default function Home() {
           marginTop: '80px',
           color: '#6c757d',
         }}>
-          <p>Interactive 3D Book Cover with Flip & Drag</p>
+          <p>Interactive 3D Book Cover with Multiple Display Modes</p>
         </footer>
       </div>
     </div>
