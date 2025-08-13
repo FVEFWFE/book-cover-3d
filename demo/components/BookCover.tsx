@@ -77,13 +77,14 @@ export const BookCover = ({
           <div className={`book-container-${uniqueId}`}>
             <div className="book">
               <div className="book-front">{children}</div>
-              {backCover && <div className="book-back">{backCover}</div>}
+              {backCover && <div className="book-back" style={{ display: 'none' }}>{backCover}</div>}
             </div>
           </div>
           {backCover && (
             <div className={`book-container-${uniqueId} book-back-container`}>
               <div className="book book-back-view">
-                <div className="book-front">{backCover}</div>
+                <div className="book-front" style={{ display: 'none' }}>{children}</div>
+                <div className="book-back">{backCover}</div>
               </div>
             </div>
           )}
@@ -182,7 +183,19 @@ export const getCssForSettings = (
       transform: rotateY(${-settings.rotateHover}deg);
     }
     
-    .book-container-${uniqueId} .book .book-front,
+    .book-container-${uniqueId} .book .book-front {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: ${settings.width}px;
+      height: ${settings.height}px;
+      transform: translateZ(${settings.thickness / 2}px);
+      border-radius: 0 ${settings.radius}px ${settings.radius}px 0;
+      box-shadow: 5px 5px 20px ${settings.shadowColor};
+      backface-visibility: hidden;
+      overflow: hidden;
+    }
+    
     .book-container-${uniqueId} .book > :first-child:not(.book-front):not(.book-back) {
       position: absolute;
       top: 0;
@@ -254,9 +267,9 @@ export const getCssForSettings = (
       width: ${settings.width}px;
       height: ${settings.height}px;
       transform: translateZ(${-settings.thickness / 2}px) rotateY(180deg);
-      background-color: ${settings.bgColor};
-      border-radius: ${settings.radius}px 0 0 ${settings.radius}px;
+      border-radius: 0 ${settings.radius}px ${settings.radius}px 0;
       backface-visibility: hidden;
+      overflow: hidden;
     }
   ` : ''
 
@@ -313,11 +326,60 @@ export const getCssForSettings = (
       }
       
       .book-container-${uniqueId}.book-back-container .book {
-        transform: rotateY(-180deg);
+        transform: rotateY(150deg);
       }
       
       .book-container-${uniqueId}.book-back-container .book:hover {
-        transform: rotateY(-175deg);
+        transform: rotateY(155deg);
+      }
+      
+      /* Keep the book structure for back view */
+      .book-container-${uniqueId}.book-back-container .book::after {
+        position: absolute;
+        top: 0;
+        left: 0;
+        content: ' ';
+        width: ${settings.width}px;
+        height: ${settings.height}px;
+        transform: translateZ(${settings.thickness / 2}px);
+        background-color: ${settings.bgColor};
+        border-radius: 0 ${settings.radius}px ${settings.radius}px 0;
+        box-shadow: 5px 5px 20px ${settings.shadowColor};
+      }
+      
+      /* Book spine/pages for back view */
+      .book-container-${uniqueId}.book-back-container .book::before {
+        position: absolute;
+        content: ' ';
+        left: 0;
+        top: ${settings.pagesOffset}px;
+        width: ${settings.thickness - 2}px;
+        height: ${settings.height - 2 * settings.pagesOffset}px;
+        transform: translateX(${settings.width - settings.thickness / 2 - settings.pagesOffset}px) rotateY(90deg);
+        background: linear-gradient(90deg, 
+          #fff 0%, #f9f9f9 5%, #fff 10%, #f9f9f9 15%, #fff 20%,
+          #f9f9f9 25%, #fff 30%, #f9f9f9 35%, #fff 40%, #f9f9f9 45%,
+          #fff 50%, #f9f9f9 55%, #fff 60%, #f9f9f9 65%, #fff 70%,
+          #f9f9f9 75%, #fff 80%, #f9f9f9 85%, #fff 90%, #f9f9f9 95%, #fff 100%
+        );
+      }
+      
+      .book-container-${uniqueId}.book-back-container .book .book-back {
+        display: block !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: ${settings.width}px;
+        height: ${settings.height}px;
+        transform: translateZ(${-settings.thickness / 2}px);
+        border-radius: 0 ${settings.radius}px ${settings.radius}px 0;
+        backface-visibility: visible;
+        overflow: hidden;
+        box-shadow: -10px 0 50px 10px ${settings.shadowColor};
+      }
+      
+      .book-container-${uniqueId}.book-back-container .book .book-front {
+        display: none !important;
       }
     `
   } else if (displayMode === 'flip') {
@@ -362,16 +424,6 @@ export const getCssForSettings = (
       
       .book-container-${uniqueId} .book.flipped:hover {
         transform: rotateY(-175deg);
-      }
-      
-      .book-container-${uniqueId} .book.flipped .book-front {
-        display: none;
-      }
-      
-      .book-container-${uniqueId} .book.flipped .book-back {
-        display: block;
-        backface-visibility: visible;
-        transform: translateZ(${settings.thickness / 2}px) rotateY(0deg);
       }
     `
   }
