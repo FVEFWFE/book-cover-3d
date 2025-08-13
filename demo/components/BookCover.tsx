@@ -364,14 +364,26 @@ export const getCssForSettings = (
         transform: rotateY(-175deg);
       }
       
+      .book-container-${uniqueId} .book .book-front {
+        transition: opacity 0.1s ease ${settings.transitionDuration * 0.7}s;
+        opacity: 1;
+      }
+      
       .book-container-${uniqueId} .book.flipped .book-front {
-        display: none;
+        opacity: 0;
+        transition: opacity 0.1s ease;
+      }
+      
+      .book-container-${uniqueId} .book .book-back {
+        opacity: 0;
+        backface-visibility: visible;
+        transform: translateZ(${settings.thickness / 2}px) rotateY(0deg);
+        transition: opacity 0.1s ease;
       }
       
       .book-container-${uniqueId} .book.flipped .book-back {
-        display: block;
-        backface-visibility: visible;
-        transform: translateZ(${settings.thickness / 2}px) rotateY(0deg);
+        opacity: 1;
+        transition: opacity 0.1s ease ${settings.transitionDuration * 0.7}s;
       }
     `
   }

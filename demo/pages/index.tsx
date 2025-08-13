@@ -1,7 +1,13 @@
-import React from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { BookCover } from '../components/BookCover'
 
 export default function Home() {
+  const [rotation, setRotation] = useState(30)
+  const [isDragging, setIsDragging] = useState(false)
+  const dragStartX = useRef(0)
+  const startRotation = useRef(30)
+  const containerRef = useRef<HTMLDivElement>(null)
+
   // Example book cover content
   const frontCover = (
     <div style={{
@@ -51,52 +57,40 @@ export default function Home() {
     </div>
   )
 
-  const imageFrontCover = (
-    <div style={{
-      width: '100%',
-      height: '100%',
-      background: 'url(https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=600&fit=crop) center/cover',
-      display: 'flex',
-      alignItems: 'flex-end',
-      justifyContent: 'center',
-      position: 'relative',
-    }}>
-      <div style={{
-        background: 'rgba(0,0,0,0.7)',
-        color: 'white',
-        padding: '20px',
-        width: '100%',
-        textAlign: 'center',
-        fontFamily: 'Georgia, serif',
-      }}>
-        <h3 style={{ margin: '0 0 5px 0', fontSize: '18px' }}>Classic Literature</h3>
-        <p style={{ margin: 0, fontSize: '12px' }}>Timeless Stories</p>
-      </div>
-    </div>
-  )
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true)
+    dragStartX.current = e.clientX
+    startRotation.current = rotation
+    e.preventDefault()
+  }
 
-  const imageBackCover = (
-    <div style={{
-      width: '100%',
-      height: '100%',
-      background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: '20px',
-      color: 'white',
-      fontFamily: 'Georgia, serif',
-      boxSizing: 'border-box',
-      textAlign: 'center',
-    }}>
-      <p style={{ fontSize: '12px', lineHeight: '1.6', fontStyle: 'italic' }}>
-        "A collection that brings together the greatest works of literature,
-        beautifully presented for the modern reader."
-      </p>
-      <p style={{ fontSize: '10px', marginTop: '20px' }}>www.classic-books.com</p>
-    </div>
-  )
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isDragging) return
+    
+    const deltaX = e.clientX - dragStartX.current
+    const newRotation = startRotation.current + (deltaX * 0.5) // Adjust sensitivity here
+    setRotation(newRotation)
+  }
+
+  const handleMouseUp = () => {
+    setIsDragging(false)
+  }
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      document.body.style.cursor = 'grabbing'
+      document.body.style.userSelect = 'none'
+      
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove)
+        document.removeEventListener('mouseup', handleMouseUp)
+        document.body.style.cursor = 'auto'
+        document.body.style.userSelect = 'auto'
+      }
+    }
+  }, [isDragging])
 
   return (
     <div style={{ 
@@ -114,24 +108,15 @@ export default function Home() {
             WebkitTextFillColor: 'transparent',
             marginBottom: '10px',
           }}>
-            3D Book Cover Demo
+            Interactive 3D Book Cover
           </h1>
           <p style={{ fontSize: '18px', color: '#6c757d' }}>
-            Interactive 3D book covers with front and back support
+            🔄 Flip the book with the button • 🖱️ Drag to rotate horizontally
           </p>
         </header>
 
-        {/* Rotate Mode */}
+        {/* Flip Mode with Draggable Rotation */}
         <section style={{ marginBottom: '80px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-            <h2 style={{ fontSize: '32px', marginBottom: '10px', color: '#212529' }}>
-              📚 Rotate Mode
-            </h2>
-            <p style={{ color: '#6c757d', maxWidth: '600px', margin: '0 auto' }}>
-              Click the button to smoothly rotate the book and reveal the back cover. 
-              Perfect for showcasing both sides with an elegant transition.
-            </p>
-          </div>
           <div style={{ 
             display: 'flex', 
             justifyContent: 'center', 
@@ -139,194 +124,63 @@ export default function Home() {
             background: 'white',
             borderRadius: '16px',
             boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+            position: 'relative',
           }}>
-            <BookCover
-              backCover={backCover}
-              displayMode="rotate"
-              rotate={30}
-              backRotate={-150}
-              width={200}
-              height={300}
+            <div 
+              ref={containerRef}
+              onMouseDown={handleMouseDown}
+              style={{ 
+                cursor: isDragging ? 'grabbing' : 'grab',
+                userSelect: 'none',
+              }}
             >
-              {frontCover}
-            </BookCover>
+              <BookCover
+                backCover={backCover}
+                displayMode="flip"
+                rotate={-rotation}
+                showFlipControls={true}
+                width={200}
+                height={300}
+                rotateHover={0} // Disable hover rotation since we're using drag
+              >
+                {frontCover}
+              </BookCover>
+            </div>
           </div>
-        </section>
-
-        {/* Side-by-Side Mode */}
-        <section style={{ marginBottom: '80px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-            <h2 style={{ fontSize: '32px', marginBottom: '10px', color: '#212529' }}>
-              👥 Side-by-Side Mode
-            </h2>
-            <p style={{ color: '#6c757d', maxWidth: '600px', margin: '0 auto' }}>
-              Display both covers simultaneously as separate 3D mockups. 
-              Ideal for comparing front and back designs at a glance.
+          
+          <div style={{ 
+            textAlign: 'center', 
+            marginTop: '30px',
+            color: '#6c757d',
+          }}>
+            <p style={{ fontSize: '14px', marginBottom: '10px' }}>
+              Current rotation: {rotation.toFixed(0)}°
             </p>
-          </div>
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            padding: '60px 40px',
-            background: 'white',
-            borderRadius: '16px',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
-          }}>
-            <BookCover
-              backCover={backCover}
-              displayMode="side-by-side"
-              rotate={30}
-              width={200}
-              height={300}
+            <button
+              onClick={() => setRotation(30)}
+              style={{
+                padding: '8px 16px',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500',
+                transition: 'all 0.3s ease',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)'
+                e.currentTarget.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.15)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)'
+              }}
             >
-              {frontCover}
-            </BookCover>
-          </div>
-        </section>
-
-        {/* Flip Mode */}
-        <section style={{ marginBottom: '80px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-            <h2 style={{ fontSize: '32px', marginBottom: '10px', color: '#212529' }}>
-              🔄 Flip Mode
-            </h2>
-            <p style={{ color: '#6c757d', maxWidth: '600px', margin: '0 auto' }}>
-              Interactive flip animation that creates a realistic page-turning effect. 
-              Engaging and smooth transition between covers.
-            </p>
-          </div>
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            padding: '60px 40px',
-            background: 'white',
-            borderRadius: '16px',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
-          }}>
-            <BookCover
-              backCover={backCover}
-              displayMode="flip"
-              rotate={30}
-              showFlipControls={true}
-              width={200}
-              height={300}
-            >
-              {frontCover}
-            </BookCover>
-          </div>
-        </section>
-
-        {/* With Images */}
-        <section style={{ marginBottom: '80px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-            <h2 style={{ fontSize: '32px', marginBottom: '10px', color: '#212529' }}>
-              🖼️ With Image Covers
-            </h2>
-            <p style={{ color: '#6c757d', maxWidth: '600px', margin: '0 auto' }}>
-              Use images or any React content for your covers. 
-              Mix and match different styles for creative presentations.
-            </p>
-          </div>
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            padding: '60px 40px',
-            background: 'white',
-            borderRadius: '16px',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
-          }}>
-            <BookCover
-              backCover={imageBackCover}
-              displayMode="side-by-side"
-              rotate={25}
-              width={220}
-              height={320}
-              thickness={55}
-            >
-              {imageFrontCover}
-            </BookCover>
-          </div>
-        </section>
-
-        {/* Custom Styling */}
-        <section style={{ marginBottom: '80px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-            <h2 style={{ fontSize: '32px', marginBottom: '10px', color: '#212529' }}>
-              🎨 Fully Customizable
-            </h2>
-            <p style={{ color: '#6c757d', maxWidth: '600px', margin: '0 auto' }}>
-              Adjust dimensions, colors, thickness, rotation angles, and more. 
-              Create the perfect 3D book mockup for your needs.
-            </p>
-          </div>
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            padding: '60px 40px',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            borderRadius: '16px',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
-          }}>
-            <BookCover
-              backCover={backCover}
-              displayMode="flip"
-              width={250}
-              height={350}
-              thickness={70}
-              rotate={45}
-              rotateHover={15}
-              bgColor="#2a2a2a"
-              shadowColor="rgba(0,0,0,0.5)"
-              radius={5}
-              pagesOffset={5}
-              transitionDuration={1.5}
-            >
-              {frontCover}
-            </BookCover>
-          </div>
-        </section>
-
-        {/* Code Example */}
-        <section style={{ marginBottom: '40px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-            <h2 style={{ fontSize: '32px', marginBottom: '10px', color: '#212529' }}>
-              💻 Easy to Use
-            </h2>
-          </div>
-          <div style={{ 
-            background: '#1e293b',
-            color: '#e2e8f0',
-            padding: '30px',
-            borderRadius: '16px',
-            fontFamily: 'monospace',
-            fontSize: '14px',
-            overflow: 'auto',
-          }}>
-            <pre style={{ margin: 0 }}>
-{`import { BookCover } from 'book-cover-3d'
-
-// Basic usage with back cover
-<BookCover backCover={backContent}>
-  {frontContent}
-</BookCover>
-
-// Side-by-side display
-<BookCover 
-  backCover={backContent}
-  displayMode="side-by-side"
->
-  {frontContent}
-</BookCover>
-
-// Interactive flip mode
-<BookCover 
-  backCover={backContent}
-  displayMode="flip"
-  showFlipControls={true}
->
-  {frontContent}
-</BookCover>`}
-            </pre>
+              Reset Rotation
+            </button>
           </div>
         </section>
 
@@ -337,15 +191,7 @@ export default function Home() {
           marginTop: '80px',
           color: '#6c757d',
         }}>
-          <p>Created with ❤️ using React and CSS3 transforms</p>
-          <p style={{ marginTop: '10px' }}>
-            <a 
-              href="https://github.com/scastiel/book-cover-3d" 
-              style={{ color: '#667eea', textDecoration: 'none' }}
-            >
-              View on GitHub
-            </a>
-          </p>
+          <p>Interactive 3D Book Cover with Flip & Drag</p>
         </footer>
       </div>
     </div>
